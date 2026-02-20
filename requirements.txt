@@ -1,0 +1,7 @@
+litellm
+mcp
+pydantic
+python-dotenv
+# FastAPI + ASGI server (standard extras include websockets & httptools)
+fastapi
+uvicorn[standard]

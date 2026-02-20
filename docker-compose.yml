@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: adk_negotiation_agent
+    ports:
+      - "8000:8000" # FastAPI / Uvicorn
+    env_file:
+      - .env # Load GROQ_API_KEY and any future secrets
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    volumes:
+      # Optional: mount source for hot-reload during local dev
+      # Comment out the next line in production
+      - .:/app

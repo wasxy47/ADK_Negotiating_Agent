@@ -1,0 +1,43 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+
+# Virtual environment - NEVER copy into Docker image
+.venv/
+venv/
+ENV/
+
+# Environment variables (injected at runtime)
+.env
+
+# VCS
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Tests
+test_*.py
+*_test.py
+.pytest_cache/
+.coverage
+
+# Docker files themselves
+Dockerfile
+docker-compose.yml
+.dockerignore

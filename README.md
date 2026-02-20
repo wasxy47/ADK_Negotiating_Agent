@@ -1,0 +1,138 @@
+# 🤖 ADK Negotiation Agent
+
+A multi-agent autonomous retail store powered by **FastAPI**, **WebSockets**, and **LiteLLM (Groq / Llama 3.3)**. Customers can discover products, negotiate prices, check inventory, and complete purchases — all through a real-time chat interface.
+
+---
+
+## ✨ Features
+
+- **Multi-Agent Pipeline** — four specialised AI agents work in sequence:
+  - 🔍 **Discovery Agent** — product search & recommendations
+  - 💰 **Negotiator Agent** — dynamic discounts based on CRM loyalty data
+  - 📦 **Inventory Agent** — real-time stock reservation
+  - 🧾 **Order Agent** — address validation, payment & invoice generation
+- **Real-time WebSocket chat** with streaming responses
+- **MCP (Model Context Protocol)** mock servers for Catalog, CRM, Inventory, and Payments
+- **FastAPI** REST + WebSocket backend with a static HTML/JS frontend
+- **LiteLLM** abstraction layer (swap models by changing one line in `config.py`)
+
+---
+
+## 🗂️ Project Structure
+
+```
+ADK_negotiation_agent/
+├── app.py                  # FastAPI entry point (WebSocket + REST)
+├── config.py               # LiteLLM / LLM configuration
+├── workflow.py             # CLI workflow runner (non-web)
+├── requirements.txt
+│
+├── adk/
+│   ├── __init__.py
+│   ├── engine.py           # Agent base class (sync + async run)
+│   └── mcp_client.py       # Tool schema builder & executor
+│
+├── agents/
+│   ├── discovery_agent.py
+│   ├── negotiator_agent.py
+│   ├── inventory_agent.py
+│   └── order_agent.py
+│
+├── mcp_servers/
+│   ├── catalog_server.py
+│   ├── crm_server.py
+│   ├── inventory_server.py
+│   └── payment_server.py
+│
+└── static/
+    ├── index.html
+    ├── style.css
+    └── js/
+```
+
+---
+
+## 🚀 Quick Start (Local)
+
+### Prerequisites
+- Python 3.11+
+- A free [Groq API key](https://console.groq.com/)
+
+### Setup
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/YOUR_USERNAME/ADK_negotiation_agent.git
+cd ADK_negotiation_agent
+
+# 2. Create & activate virtual environment
+python -m venv .venv
+# Windows:
+.venv\Scripts\activate
+# macOS/Linux:
+source .venv/bin/activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Configure environment
+cp .env.example .env
+# Edit .env and add your GROQ_API_KEY
+
+# 5. Run the server
+python app.py
+```
+
+Open [http://localhost:8000](http://localhost:8000) in your browser.
+
+---
+
+## 🐳 Docker
+
+### Build & Run (single container)
+
+```bash
+# Using docker-compose (recommended)
+docker-compose up --build
+
+# Or directly with Docker
+docker build -t adk-negotiation-agent .
+docker run -p 8000:8000 --env-file .env adk-negotiation-agent
+```
+
+> **Note:** Make sure your `.env` file has `GROQ_API_KEY` set before running Docker.
+
+App will be available at [http://localhost:8000](http://localhost:8000).
+
+### Stop
+
+```bash
+docker-compose down
+```
+
+---
+
+## ⚙️ Configuration
+
+| Variable | Description | Required |
+|---|---|---|
+| `GROQ_API_KEY` | API key from [console.groq.com](https://console.groq.com/) | ✅ Yes |
+
+To switch LLM models, edit `DEFAULT_MODEL` in `config.py`:
+```python
+DEFAULT_MODEL = "groq/llama-3.3-70b-versatile"  # Default
+# DEFAULT_MODEL = "groq/mixtral-8x7b-32768"     # Alternative
+```
+
+---
+
+## 🧪 Testing Checkout (Mock Data)
+
+- **Payment token:** `mock_token_123`
+- **Test user:** `user_456` (Bronze tier, first-time buyer — 5% max discount)
+
+---
+
+## 📄 License
+
+MIT

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autonomous Retail Store | Premium Experience</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="background-elements">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Left Panel: Catalog -->
+        <div class="catalog-panel glass-panel">
+            <header class="panel-header">
+                <h1>Nexus Store</h1>
+                <p>Discover our premium tech collection.</p>
+            </header>
+
+            <div class="product-grid" id="productGrid">
+                <!-- Products injected via JS -->
+            </div>
+        </div>
+
+        <!-- Right Panel: AI Shopping Assistant -->
+        <div class="chat-panel glass-panel">
+            <header class="panel-header chat-header">
+                <div class="ai-avatar">
+                    <div class="pulse"></div>
+                </div>
+                <div>
+                    <h2>AI Shopping Assistant</h2>
+                    <p id="agentStatus" class="agent-status typing">Agent: Discovery</p>
+                </div>
+            </header>
+
+            <div class="chat-history" id="chatHistory">
+                <div class="message assistant-message">
+                    Hello! Welcome to the Autonomous Retail Store. I'm your Product Discovery agent. How can I help you
+                    find the perfect product today?
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <form id="chatForm">
+                    <input type="text" id="userInput" placeholder="Ask about our products..." autocomplete="off"
+                        required>
+                    <button type="submit" id="sendBtn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <!-- Cart Floating Widget -->
+        <div id="cartContainer" class="cart-widget" style="display: none;"></div>
+    </div>
+
+    <script type="module" src="/static/js/app.js"></script>
+</body>
+
+</html>
