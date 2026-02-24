@@ -11,6 +11,19 @@ def handoff_to_inventory(product_id: str, agreed_price: float, reason: str) -> s
     Call this ONLY after the customer explicitly agrees to a specific price.
     agreed_price must be >= the floor_price from get_product_pricing_intel.
     """
+    # [SECURITY MITIGATION]: Server-side validation to prevent context spoofing
+    intel_json = get_product_pricing_intel(product_id)
+    try:
+        intel = json.loads(intel_json)
+        if "floor_price" in intel:
+            floor_price = intel["floor_price"]
+            if agreed_price < floor_price:
+                return json.dumps({
+                    "error": "SECURITY VIOLATION: The requested handoff price is below the allowable floor price. You MUST negotiate a higher price."
+                })
+    except Exception as e:
+        return f"Error verifying price limits: {e}"
+
     return json.dumps({
         "handoff_to": "Inventory",
         "product_id": product_id,
