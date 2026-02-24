@@ -100,8 +100,23 @@ async def websocket_chat(websocket: WebSocket, session_id: str):
             if not user_message:
                 continue
 
+            if user_message.strip() == "/reset_session":
+                sessions[session_id] = AgentState(
+                    user_id=session_id, 
+                    messages=[], 
+                    shared_context={}, 
+                    current_agent="Discovery"
+                )
+                continue
+
             if state.current_agent in ["Completed", "None"]:
-                await manager.send_event(session_id, "chat_stream", "Transaction ended. Please refresh or clear session.", agent=state.current_agent)
+                sessions[session_id] = AgentState(
+                    user_id=session_id, 
+                    messages=[], 
+                    shared_context={}, 
+                    current_agent="Discovery"
+                )
+                await manager.send_event(session_id, "reset_ui", {}, agent="system")
                 continue
                 
             state.messages.append({"role": "user", "content": user_message})
@@ -125,7 +140,13 @@ async def websocket_chat(websocket: WebSocket, session_id: str):
                     break_to_user = True
                     
             if state.current_agent in ["Completed", "None"]:
-                await manager.send_event(session_id, "chat_stream", "*[System: Transaction concluded. Thank you!]*", agent="system")
+                sessions[session_id] = AgentState(
+                    user_id=session_id, 
+                    messages=[], 
+                    shared_context={}, 
+                    current_agent="Discovery"
+                )
+                await manager.send_event(session_id, "reset_ui", {}, agent="system")
 
     except WebSocketDisconnect:
         manager.disconnect(session_id)

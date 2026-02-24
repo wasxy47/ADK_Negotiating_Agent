@@ -15,11 +15,11 @@ def validate_shipping_address(street: str, city: str, zip_code: str, country: st
     return json.dumps({"valid": True, "normalized_address": f"{street}, {city}, {zip_code}, {country}"})
 
 @mcp.tool()
-def process_payment(user_id: str, amount: float, payment_token: str) -> str:
+def process_payment(user_id: str, amount: float, payment_method: str) -> str:
     """
     Processes a simulated payment and returns a transaction ID if successful.
     """
-    if payment_token == "DECLINED_TOKEN":
+    if payment_method == "DECLINED_TOKEN":
         return json.dumps({"success": False, "reason": "Card declined by bank."})
         
     transaction_id = str(uuid.uuid4())

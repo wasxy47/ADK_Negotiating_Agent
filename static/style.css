@@ -22,10 +22,7 @@ body {
     background-color: var(--bg-dark);
     color: var(--text-primary);
     min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 /* Background animated orbs */
@@ -97,14 +94,13 @@ body {
     }
 }
 
-/* Glass Panels Layout */
 .app-container {
-    width: 95%;
-    max-width: 1400px;
-    height: 90vh;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem 2rem;
+    display: flex;
+    flex-direction: column;
     z-index: 1;
 }
 
@@ -136,6 +132,7 @@ h1 {
     font-size: 2rem;
     background: linear-gradient(to right, #60a5fa, #c084fc);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 0.5rem;
 }
@@ -146,17 +143,9 @@ p {
     line-height: 1.5;
 }
 
-/* Left Panel - Product Grid */
-.catalog-panel {
-    flex: 1;
-}
-
+/* Catalog Grid Settings */
 .product-grid {
-    padding: 2rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.5rem;
-    overflow-y: auto;
+    padding: 1rem 0;
     flex: 1;
 }
 
@@ -197,6 +186,24 @@ p {
     font-weight: 600;
 }
 
+.category-pills button {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    padding: 0.4rem 1rem;
+    border-radius: 99px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.category-pills button:hover,
+.category-pills button.active {
+    background: rgba(139, 92, 246, 0.2);
+    color: white;
+    border-color: rgba(139, 92, 246, 0.5);
+}
+
 .product-title {
     font-family: 'Outfit', sans-serif;
     font-size: 1.25rem;
@@ -226,9 +233,21 @@ p {
     font-weight: 400;
 }
 
-/* Right Panel - Chat Application */
-.chat-panel {
-    flex: 1;
+/* Floating Chat Application */
+
+#floatingChatPanel.expanded-chat {
+    width: 600px !important;
+    height: 80vh !important;
+    max-height: 90vh !important;
+}
+
+@media (max-width: 768px) {
+    #floatingChatPanel.expanded-chat {
+        width: 95vw !important;
+        height: 85vh !important;
+        bottom: 4rem !important;
+        right: 2.5vw !important;
+    }
 }
 
 .chat-header {
@@ -468,18 +487,16 @@ p {
 
 @media (max-width: 1024px) {
     .app-container {
-        grid-template-columns: 1fr;
-        height: auto;
-        min-height: 95vh;
-        margin: 2vh 0;
+        padding: 0 1rem 2rem 1rem;
     }
 
-    .catalog-panel {
-        height: 500px;
+    .hero-banner {
+        padding: 2rem !important;
+        min-height: 300px !important;
     }
 
-    .chat-panel {
-        height: 600px;
+    .hero-banner h2 {
+        font-size: 2rem !important;
     }
 }
 
@@ -503,7 +520,7 @@ p {
 /* Cart Widget */
 .cart-widget {
     position: fixed;
-    top: 2rem;
+    bottom: 2rem;
     right: 2rem;
     width: 300px;
     background: var(--glass-bg);
@@ -544,4 +561,62 @@ p {
     color: #a78bfa;
     text-transform: uppercase;
     text-align: right;
+}
+
+/* Modal Animations & Styles */
+.product-modal-overlay {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+}
+
+.product-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.product-modal-content {
+    transform: translateY(20px) scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.product-modal-overlay.active .product-modal-content {
+    transform: translateY(0) scale(1);
+}
+
+.btn-primary:hover {
+    background: #2563eb !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+/* Hero Slideshow */
+.hero-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    transform: scale(1.05);
+    display: flex;
+    align-items: center;
+}
+
+.hero-slide.active {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    z-index: 1;
+}
+
+.slide-dot:hover {
+    background: #ec4899 !important;
 }

@@ -5,12 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Autonomous Retail Store | Premium Experience</title>
+    <!-- Add matching gradient tech logo as favicon -->
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b5cf6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polygon points='12 2 2 7 12 12 22 7 12 2'/><polyline points='2 17 12 22 22 17'/><polyline points='2 12 12 17 22 12'/></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 
 <body>
@@ -21,44 +25,150 @@
     </div>
 
     <div class="app-container">
-        <!-- Left Panel: Catalog -->
-        <div class="catalog-panel glass-panel">
-            <header class="panel-header">
-                <h1>Nexus Store</h1>
-                <p>Discover our premium tech collection.</p>
+        <!-- Top Navigation Bar -->
+        <nav class="top-nav glass-panel"
+            style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding: 1rem 2rem; z-index: 10;">
+            <div class="nav-brand" style="display: flex; align-items: center; gap: 1rem;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="url(#gradient)" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#60a5fa" />
+                            <stop offset="100%" stop-color="#c084fc" />
+                        </linearGradient>
+                    </defs>
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                    <polyline points="2 17 12 22 22 17"></polyline>
+                    <polyline points="2 12 12 17 22 12"></polyline>
+                </svg>
+                <h1 style="margin: 0; font-size: 1.5rem;">TechVault</h1>
+            </div>
+            <div class="nav-search" style="flex: 0 1 400px; position: relative;">
+                <input type="text" id="storeSearch" placeholder="Search products..."
+                    style="width: 100%; padding: 0.75rem 1.25rem; border-radius: 99px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; outline: none;">
+            </div>
+            <div class="nav-cart" style="display: flex; align-items: center; gap: 1rem;">
+                <button id="viewCartBtn"
+                    style="background: none; border: none; color: #fff; cursor: pointer; position: relative;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    <span id="cartCountBadge"
+                        style="position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; font-weight: bold;">0</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Hero Banner Slideshow -->
+        <section id="heroSlideshow" class="hero-banner"
+            style="position: relative; border-radius: 16px; overflow: hidden; margin-top: 2rem; min-height: 400px; display: flex; align-items: center; background: rgba(0,0,0,0.2);">
+            <!-- Slides injected via JS -->
+            <!-- Controls injected via JS -->
+        </section>
+
+        <!-- Catalog Section -->
+        <section class="catalog-panel" style="margin-top: 3rem;">
+            <header class="panel-header"
+                style="display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 1.5rem;">
+                <div>
+                    <h2 style="font-size: 1.5rem; color: #fff; margin-bottom: 1rem;">Shop by Category</h2>
+                    <div id="categoryFilters" class="category-pills"
+                        style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        <!-- Category pills injected here -->
+                    </div>
+                </div>
             </header>
 
-            <div class="product-grid" id="productGrid">
+            <div class="product-grid" id="productGrid"
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem;">
                 <!-- Products injected via JS -->
             </div>
-        </div>
+        </section>
 
-        <!-- Right Panel: AI Shopping Assistant -->
-        <div class="chat-panel glass-panel">
-            <header class="panel-header chat-header">
-                <div class="ai-avatar">
-                    <div class="pulse"></div>
+        <!-- Floating AI Widget Button -->
+        <button id="aiWidgetToggle" title="Chat with AI Agent"
+            style="position: fixed; bottom: 2rem; right: 2rem; width: 64px; height: 64px; border-radius: 50%; border: none; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; cursor: pointer; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.5); z-index: 100; display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <div id="aiWidgetBadge"
+                style="position: absolute; top: 0; right: 0; background: #ef4444; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #0f172a; display: none;">
+            </div>
+        </button>
+
+        <!-- Floating Chat Panel -->
+        <div id="floatingChatPanel" class="chat-panel glass-panel"
+            style="position: fixed; bottom: 6rem; right: 2rem; width: 400px; height: 600px; max-height: calc(100vh - 8rem); z-index: 99; display: flex; flex-direction: column; opacity: 0; visibility: hidden; transform: translateY(20px); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+            <header class="panel-header chat-header"
+                style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="ai-avatar">
+                        <div class="pulse"></div>
+                    </div>
+                    <div>
+                        <h2 style="font-size: 1.1rem; margin-bottom: 0.2rem;">AI Assistant</h2>
+                        <p id="agentStatus" class="agent-status typing" style="font-size: 0.8rem;">Agent: Discovery</p>
+                    </div>
                 </div>
-                <div>
-                    <h2>AI Shopping Assistant</h2>
-                    <p id="agentStatus" class="agent-status typing">Agent: Discovery</p>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button id="resetSessionBtn" title="Reset Session"
+                        style="background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 5px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                            <path d="M3 3v5h5"></path>
+                        </svg>
+                    </button>
+                    <button id="expandChatBtn" title="Expand"
+                        style="background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 5px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <polyline points="9 21 3 21 3 15"></polyline>
+                            <line x1="21" y1="3" x2="14" y2="10"></line>
+                            <line x1="3" y1="21" x2="10" y2="14"></line>
+                        </svg>
+                    </button>
+                    <button id="closeChatBtn" title="Minimize"
+                        style="background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 5px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
                 </div>
             </header>
 
-            <div class="chat-history" id="chatHistory">
+            <div class="chat-history" id="chatHistory" style="flex: 1; overflow-y: auto; padding: 1.5rem;">
                 <div class="message assistant-message">
-                    Hello! Welcome to the Autonomous Retail Store. I'm your Product Discovery agent. How can I help you
-                    find the perfect product today?
+                    Hello! I'm your TechVault Product Advisor. How can I help you
+                    find the perfect tech today? Or, if you see something you like, I can help you negotiate the price!
                 </div>
             </div>
 
-            <div class="chat-input-area">
-                <form id="chatForm">
-                    <input type="text" id="userInput" placeholder="Ask about our products..." autocomplete="off"
-                        required>
-                    <button type="submit" id="sendBtn">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            <div class="chat-input-area"
+                style="padding: 1rem 1.5rem; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.1);">
+                <form id="chatForm" style="display: flex; gap: 8px;">
+                    <button type="button" id="micBtn"
+                        style="background: none; border: none; color: #aaa; cursor: pointer; padding: 0 5px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                            <line x1="12" y1="19" x2="12" y2="22"></line>
+                        </svg>
+                    </button>
+                    <input type="text" id="userInput" placeholder="Ask about our products..." autocomplete="off"
+                        required
+                        style="flex-grow: 1; padding: 0.6rem 1rem; border-radius: 99px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: white; outline: none;">
+                    <button type="submit" id="sendBtn"
+                        style="background: #3b82f6; border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: -2px;">
                             <line x1="22" y1="2" x2="11" y2="13"></line>
                             <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                         </svg>
@@ -66,9 +176,163 @@
                 </form>
             </div>
         </div>
+
         <!-- Cart Floating Widget -->
-        <div id="cartContainer" class="cart-widget" style="display: none;"></div>
+        <div id="cartContainer" class="cart-widget" style="display: none; z-index: 101; bottom: 6rem;"></div>
+
+        <!-- Product Details Modal (Hidden by Default) -->
+        <div id="productModal" class="product-modal-overlay"
+            style="display: flex; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center;">
+            <div class="product-modal-content glass-panel"
+                style="width: 90%; max-width: 900px; max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; position: relative;">
+                <button id="closeModalBtn"
+                    style="position: absolute; top: 1.5rem; right: 1.5rem; background: rgba(255,255,255,0.1); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; z-index: 2;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+                <div id="modalBody" style="padding: 2.5rem;">
+                    <!-- Modal Content Injected via JS -->
+                </div>
+                <div class="modal-actions"
+                    style="padding: 1.5rem 2.5rem; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 1rem; justify-content: flex-end; background: rgba(0,0,0,0.2);">
+                    <button id="modalBuyBtn" class="btn-primary"
+                        style="padding: 0.85rem 1.75rem; border-radius: 8px; border: none; background: #3b82f6; color: white; font-weight: 600; font-size: 1.05rem; cursor: pointer; transition: 0.2s;">Buy
+                        Now at MRP</button>
+                    <button id="modalNegotiateBtn" class="btn-gradient"
+                        style="padding: 0.85rem 1.75rem; border-radius: 8px; border: none; background: linear-gradient(135deg, #8b5cf6, #ec4899); color: white; font-weight: 600; font-size: 1.05rem; cursor: pointer; transition: 0.2s;">Negotiate
+                        Price with AI</button>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Professional Footer -->
+    <footer
+        style="margin-top: 4rem; padding: 4rem 2rem 2rem; background: rgba(0,0,0,0.4); border-top: 1px solid rgba(255,255,255,0.05);">
+        <div style="max-width: 1600px; margin: 0 auto;">
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 3rem; margin-bottom: 3rem;">
+                <!-- Brand details -->
+                <div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="url(#gradient)"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                            <polyline points="2 17 12 22 22 17"></polyline>
+                            <polyline points="2 12 12 17 22 12"></polyline>
+                        </svg>
+                        <h2
+                            style="font-size: 1.25rem; margin: 0; background: linear-gradient(135deg, #60a5fa, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                            TechVault</h2>
+                    </div>
+                    <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Your ultimate destination for
+                        premium, autonomous electronics shopping. Experience the future of retail.</p>
+                </div>
+                <!-- Links list -->
+                <div>
+                    <h3 style="color: #f1f5f9; font-size: 1.05rem; margin-bottom: 1.25rem;">Shop</h3>
+                    <ul
+                        style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem;">
+                        <li><a href="#"
+                                style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;"
+                                onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Latest
+                                Arrivals</a></li>
+                        <li><a href="#"
+                                style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;"
+                                onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Smart
+                                Home</a></li>
+                        <li><a href="#"
+                                style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;"
+                                onmouseover="this.style.color='#fff'"
+                                onmouseout="this.style.color='#94a3b8'">Computers</a></li>
+                        <li><a href="#"
+                                style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;"
+                                onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Audio &
+                                Gaming</a></li>
+                    </ul>
+                </div>
+                <!-- Support list -->
+                <div>
+                    <h3 style="color: #f1f5f9; font-size: 1.05rem; margin-bottom: 1.25rem;">Support</h3>
+                    <ul
+                        style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem;">
+                        <li><a href="#"
+                                style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;"
+                                onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Help
+                                Center</a></li>
+                        <li><a href="#"
+                                style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;"
+                                onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Track
+                                Order</a></li>
+                        <li><a href="#"
+                                style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;"
+                                onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Returns &
+                                Refunds</a></li>
+                        <li><a href="#"
+                                style="color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s;"
+                                onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Talk to
+                                AI</a></li>
+                    </ul>
+                </div>
+                <!-- Contact info -->
+                <div>
+                    <h3 style="color: #f1f5f9; font-size: 1.05rem; margin-bottom: 1.25rem;">Contact Us</h3>
+                    <ul
+                        style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem; color: #94a3b8; font-size: 0.9rem;">
+                        <li style="display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
+                                </path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                            hello@techvault.ai
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                                </path>
+                            </svg>
+                            1-800-TECH-AI
+                        </li>
+                        <li style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
+                            <!-- Social Icons -->
+                            <a href="#" style="color: #94a3b8; transition: color 0.2s;"
+                                onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'"><svg
+                                    width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path
+                                        d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z">
+                                    </path>
+                                </svg></a>
+                            <a href="#" style="color: #94a3b8; margin-left:10px; transition: color 0.2s;"
+                                onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'"><svg
+                                    width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                                </svg></a>
+                            <a href="#" style="color: #94a3b8; margin-left:10px; transition: color 0.2s;"
+                                onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'"><svg
+                                    width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                                </svg></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div
+                style="text-align: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 2rem; color: #64748b; font-size: 0.85rem;">
+                &copy; 2026 TechVault. Powered by Autonomous Retail AI. All rights reserved.
+            </div>
+        </div>
+    </footer>
 
     <script type="module" src="/static/js/app.js"></script>
 </body>

@@ -1,10 +1,18 @@
-# 🤖 ADK Negotiation Agent
+# 🤖 ADK Negotiation Agent (v2.0)
 
 A multi-agent autonomous retail store powered by **FastAPI**, **WebSockets**, and **LiteLLM (Groq / Llama 3.3)**. Customers can discover products, negotiate prices, check inventory, and complete purchases — all through a real-time chat interface.
 
+**🚀 What's New in Version 2.0:**
+- **Premium Storefront Redesign:** A massive, full-width Apple-style dashboard with dark mode and glassmorphism.
+- **Dynamic Hero Slideshow:** Auto-fading banner showcasing the top featured products.
+- **Real-Time Live Search:** Grid instantly filters matching products as you type.
+- **Advanced Negotiator AI:** The sales agent now employs real-world psychological pricing tactics like *Anchoring*, *Reasoned Offers*, and *Small Concessions*.
+- **Floating AI Assistant:** Chat seamlessly via a sleek, non-intrusive floating widget rather than a split-screen panel.
+- **Interactive UI:** Smooth Quick-View product modals and dynamic cart updates.
+
 ---
 
-## ✨ Features
+## ✨ Core Features
 
 - **Multi-Agent Pipeline** — four specialised AI agents work in sequence:
   - 🔍 **Discovery Agent** — product search & recommendations
@@ -20,12 +28,16 @@ A multi-agent autonomous retail store powered by **FastAPI**, **WebSockets**, an
 
 ## 🗂️ Project Structure
 
-```
+```text
 ADK_negotiation_agent/
 ├── app.py                  # FastAPI entry point (WebSocket + REST)
 ├── config.py               # LiteLLM / LLM configuration
 ├── workflow.py             # CLI workflow runner (non-web)
 ├── requirements.txt
+├── .env.example
+├── test_models.py          # Test models
+├── Dockerfile              # Dockerfile for building the image
+├── docker-compose.yml      # Docker-compose file for running the application
 │
 ├── adk/
 │   ├── __init__.py
@@ -62,8 +74,8 @@ ADK_negotiation_agent/
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/YOUR_USERNAME/ADK_negotiation_agent.git
-cd ADK_negotiation_agent
+git clone https://github.com/wasxy47/ADK_Negotiating_Agent.git
+cd ADK_Negotiating_Agent
 
 # 2. Create & activate virtual environment
 python -m venv .venv
@@ -76,7 +88,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 
 # 4. Configure environment
-cp .env.example .env
+copy .env.example .env  # Or simply rename the file and fill it out
 # Edit .env and add your GROQ_API_KEY
 
 # 5. Run the server
@@ -128,8 +140,16 @@ DEFAULT_MODEL = "groq/llama-3.3-70b-versatile"  # Default
 
 ## 🧪 Testing Checkout (Mock Data)
 
-- **Payment token:** `mock_token_123`
+- **Payment Method:** Cash, Credit, or Bank Transfer
 - **Test user:** `user_456` (Bronze tier, first-time buyer — 5% max discount)
+
+---
+
+## 🤝 Contributors
+
+This v2.0 update and storefront redesign was brought to life by:
+- **Abdul Wasay** ([@wasxy47](https://github.com/wasxy47))
+- **Hassan** ([@hassanzzzj](https://github.com/hassanzzzj))
 
 ---
 

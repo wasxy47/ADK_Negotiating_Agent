@@ -6,6 +6,63 @@ export function initChat() {
     const input = document.getElementById("userInput");
     const history = document.getElementById("chatHistory");
     const agentStatus = document.getElementById("agentStatus");
+    const resetBtn = document.getElementById("resetSessionBtn");
+    const micBtn = document.getElementById("micBtn");
+
+    // Floating Widget Elements
+    const aiWidgetToggle = document.getElementById("aiWidgetToggle");
+    const closeChatBtn = document.getElementById("closeChatBtn");
+    const floatingChatPanel = document.getElementById("floatingChatPanel");
+    const aiWidgetBadge = document.getElementById("aiWidgetBadge");
+
+    let currentBotMessageDiv = null;
+    let isChatOpen = false;
+
+    // Toggle logic
+    function toggleChat(forceState) {
+        if (typeof forceState === "boolean") {
+            isChatOpen = forceState;
+        } else {
+            isChatOpen = !isChatOpen;
+        }
+
+        if (isChatOpen) {
+            floatingChatPanel.style.opacity = '1';
+            floatingChatPanel.style.visibility = 'visible';
+            floatingChatPanel.style.transform = 'translateY(0)';
+            aiWidgetBadge.style.display = 'none';
+            scrollToBottom();
+            setTimeout(() => input.focus(), 300);
+        } else {
+            floatingChatPanel.style.opacity = '0';
+            floatingChatPanel.style.visibility = 'hidden';
+            floatingChatPanel.style.transform = 'translateY(20px)';
+        }
+    }
+
+    aiWidgetToggle.addEventListener("click", () => toggleChat());
+    closeChatBtn.addEventListener("click", () => toggleChat(false));
+
+    const expandChatBtn = document.getElementById("expandChatBtn");
+    let isChatExpanded = false;
+    expandChatBtn.addEventListener("click", () => {
+        isChatExpanded = !isChatExpanded;
+        if (isChatExpanded) {
+            floatingChatPanel.classList.add("expanded-chat");
+            expandChatBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
+            expandChatBtn.title = "Shrink";
+        } else {
+            floatingChatPanel.classList.remove("expanded-chat");
+            expandChatBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
+            expandChatBtn.title = "Expand";
+        }
+        scrollToBottom();
+    });
+
+    // Expose openChat globally so catalog buttons can trigger it
+    window.openAIWidget = function () {
+        toggleChat(true);
+    };
 
     // Send Message
     form.addEventListener("submit", (e) => {
@@ -16,6 +73,9 @@ export function initChat() {
         appendMessage(message, "user");
         input.value = "";
 
+        // Reset the tracker so the next bot response starts a fresh bubble
+        currentBotMessageDiv = null;
+
         const sent = wsClient.sendMessage(message);
         if (!sent) {
             appendMessage("Connection offline. Please wait...", "system");
@@ -24,23 +84,79 @@ export function initChat() {
         }
     });
 
+    // Voice Input Feature
+    if ('webkitSpeechRecognition' in window) {
+        const recognition = new webkitSpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        micBtn.addEventListener("click", () => {
+            micBtn.style.color = "#ef4444"; // Red to show recording
+            recognition.start();
+        });
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            input.value = transcript;
+            micBtn.style.color = "#aaa";
+            form.dispatchEvent(new Event('submit'));
+        };
+
+        recognition.onerror = (event) => {
+            console.error(event);
+            micBtn.style.color = "#aaa";
+        };
+
+        recognition.onend = () => {
+            micBtn.style.color = "#aaa";
+        };
+    } else {
+        micBtn.style.display = "none";
+    }
+
+    // Reset Session
+    resetBtn.addEventListener("click", () => {
+        // Clear locally
+        history.innerHTML = '<div class="message assistant-message">Session reset. Welcome to the Autonomous Retail Store!</div>';
+        currentBotMessageDiv = null;
+        // Optionally notify backend if needed
+        wsClient.sendMessage("/reset_session");
+    });
+
     // Listen for WebSockets
     wsClient.on('chat_stream', (data) => {
         removeTypingIndicator();
-        const lines = data.text.split('\n\n');
-        lines.forEach(line => {
-            if (line.startsWith('*[System:')) {
-                appendMessage(line, 'system');
-            } else {
-                let formatted = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
-                appendMessage(formatted, 'assistant', true);
-            }
-        });
+
+        let content = data.text;
+
+        // If it's a system message
+        if (content.startsWith('*[System:')) {
+            appendMessage(content, 'system');
+            currentBotMessageDiv = null; // force next message to be a new one
+            return;
+        }
+
+        // Pop badge if panel is closed
+        if (!isChatOpen) {
+            aiWidgetBadge.style.display = 'block';
+        }
+
+        // Format markdown
+        let htmlContent = marked.parse(content);
+
+        if (!currentBotMessageDiv) {
+            // Create a new bubble if there isn't one active for this turn
+            currentBotMessageDiv = appendMessage(htmlContent, 'assistant', true);
+        } else {
+            // Append to existing bubble to prevent multi-popups
+            currentBotMessageDiv.innerHTML += htmlContent;
+            scrollToBottom();
+        }
     });
 
     wsClient.on('agent_transition', (data) => {
-        appendMessage(`*[System: Transferring you to ${data.to} agent... Reason: ${data.reason}]*`, 'system');
+        // System message removed
     });
 
     wsClient.on('tool_call', (data) => {
@@ -56,6 +172,7 @@ export function initChat() {
     wsClient.on('sync_state', (payload) => {
         // Clear history and hydrate
         history.innerHTML = '';
+        currentBotMessageDiv = null;
         if (payload.messages && payload.messages.length > 0) {
             payload.messages.forEach(msg => {
                 if (msg.role === 'user') {
@@ -64,7 +181,7 @@ export function initChat() {
                     // Only show cleaned text
                     let cleaned = msg.content.replace(/\{.*?\}/g, '').trim();
                     if (cleaned) {
-                        appendMessage(cleaned, 'assistant');
+                        appendMessage(marked.parse(cleaned), 'assistant', true);
                     }
                 }
             });
@@ -72,6 +189,12 @@ export function initChat() {
             appendMessage("Hello! Welcome to the Autonomous Retail Store. I'm your Product Discovery agent. How can I help you find the perfect product today?", "assistant");
         }
         updateAgentColor(state.currentAgent);
+    });
+
+    wsClient.on('reset_ui', () => {
+        history.innerHTML = '<div class="message assistant-message">Transaction ended. Session has been automatically reset. Welcome back!</div>';
+        currentBotMessageDiv = null;
+        state.setAgent('Discovery');
     });
 
     state.subscribe('agentChanged', (agentName) => {
@@ -101,6 +224,7 @@ export function initChat() {
         }
         history.appendChild(div);
         scrollToBottom();
+        return div;
     }
 
     function showTypingIndicator() {

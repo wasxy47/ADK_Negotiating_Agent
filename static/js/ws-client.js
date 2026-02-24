@@ -56,6 +56,9 @@ class WSClient {
             case 'tool_call':
                 this.trigger('tool_call', payload);
                 break;
+            case 'reset_ui':
+                this.trigger('reset_ui', payload);
+                break;
             default:
                 console.warn('Unknown event type:', type);
         }
