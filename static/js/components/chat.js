@@ -117,10 +117,20 @@ export function initChat() {
 
     // Reset Session
     resetBtn.addEventListener("click", () => {
-        // Clear locally
-        history.innerHTML = '<div class="message assistant-message">Session reset. Welcome to the Autonomous Retail Store!</div>';
+        // Clear all UI state immediately
+        history.innerHTML = '';
         currentBotMessageDiv = null;
-        // Optionally notify backend if needed
+        removeTypingIndicator();
+        state.setAgent('Discovery');
+        updateAgentColor('Discovery');
+
+        // Show a clean welcome
+        appendMessage(
+            "Session reset! I'm Zara, your TechVault consultant. How can I help you today?",
+            "assistant"
+        );
+
+        // Notify backend — it will reply with sync_state confirming the clean session
         wsClient.sendMessage("/reset_session");
     });
 
@@ -201,13 +211,72 @@ export function initChat() {
         updateAgentColor(agentName);
     });
 
+    // ── Agent identity map ────────────────────────────────────────────────────
+    const AGENT_IDENTITY = {
+        Discovery: {
+            avatar: '/static/avatar_zara.png',
+            name: 'Zara',
+            role: 'Product Consultant · Discovery',
+            border: 'rgba(52,211,153,0.7)',
+            glow: 'rgba(52,211,153,0.3)',
+            dot: '#34d399',
+            status: '#34d399',
+        },
+        Negotiator: {
+            avatar: '/static/avatar_rayan.png',
+            name: 'Rayan',
+            role: 'Senior Negotiator · Deal Desk',
+            border: 'rgba(245,158,11,0.7)',
+            glow: 'rgba(245,158,11,0.3)',
+            dot: '#f59e0b',
+            status: '#f59e0b',
+        },
+        Inventory: {
+            avatar: '/static/avatar_inventory.png',
+            name: 'Inventory AI',
+            role: 'Stock Verification System',
+            border: 'rgba(139,92,246,0.7)',
+            glow: 'rgba(139,92,246,0.3)',
+            dot: '#8b5cf6',
+            status: '#8b5cf6',
+        },
+        OrderTaking: {
+            avatar: '/static/avatar_omar.png',
+            name: 'Omar',
+            role: 'Checkout Specialist · Orders',
+            border: 'rgba(59,130,246,0.7)',
+            glow: 'rgba(59,130,246,0.3)',
+            dot: '#3b82f6',
+            status: '#3b82f6',
+        },
+    };
+
     function updateAgentColor(agentName) {
-        agentStatus.textContent = "Agent: " + agentName;
-        if (agentName === 'Negotiator') agentStatus.style.color = "#f59e0b";
-        else if (agentName === 'OrderTaking') agentStatus.style.color = "#3b82f6";
-        else if (agentName === 'Inventory') agentStatus.style.color = "#8b5cf6";
-        else agentStatus.style.color = "#34d399";
+        const identity = AGENT_IDENTITY[agentName] || AGENT_IDENTITY.Discovery;
+
+        const avatarEl = document.getElementById('agentAvatar');
+        const displayNameEl = document.getElementById('agentDisplayName');
+        const liveDotEl = document.getElementById('agentLiveDot');
+
+        // Animate swap: shrink → swap → pop
+        if (avatarEl) {
+            avatarEl.style.transform = 'scale(0.75)';
+            avatarEl.style.opacity = '0';
+            setTimeout(() => {
+                avatarEl.src = identity.avatar;
+                avatarEl.style.borderColor = identity.border;
+                avatarEl.style.boxShadow = `0 0 18px ${identity.glow}`;
+                avatarEl.style.transform = 'scale(1)';
+                avatarEl.style.opacity = '1';
+            }, 200);
+        }
+        if (displayNameEl) displayNameEl.textContent = identity.name;
+        if (liveDotEl) liveDotEl.style.background = identity.dot;
+
+        agentStatus.textContent = identity.role;
+        agentStatus.style.color = identity.status;
     }
+
 
     function appendMessage(text, role, renderHTML = false) {
         const div = document.createElement("div");

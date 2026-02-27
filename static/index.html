@@ -104,13 +104,28 @@
             style="position: fixed; bottom: 6rem; right: 2rem; width: 400px; height: 600px; max-height: calc(100vh - 8rem); z-index: 99; display: flex; flex-direction: column; opacity: 0; visibility: hidden; transform: translateY(20px); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
             <header class="panel-header chat-header"
                 style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <div class="ai-avatar">
-                        <div class="pulse"></div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <!-- Agent Avatar — swapped by chat.js on agent change -->
+                    <div style="position: relative; flex-shrink: 0;">
+                        <img id="agentAvatar" src="/static/avatar_zara.png" alt="Agent" style="
+                                width: 48px; height: 48px; border-radius: 50%;
+                                object-fit: cover; object-position: top;
+                                border: 2px solid rgba(139,92,246,0.6);
+                                box-shadow: 0 0 16px rgba(139,92,246,0.35);
+                                transition: all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+                            ">
+                        <!-- Live indicator dot -->
+                        <span id="agentLiveDot" style="
+                            position: absolute; bottom: 1px; right: 1px;
+                            width: 11px; height: 11px; border-radius: 50%;
+                            background: #34d399; border: 2px solid #0f172a;
+                            display: block; transition: background 0.3s;
+                        "></span>
                     </div>
                     <div>
-                        <h2 style="font-size: 1.1rem; margin-bottom: 0.2rem;">AI Assistant</h2>
-                        <p id="agentStatus" class="agent-status typing" style="font-size: 0.8rem;">Agent: Discovery</p>
+                        <h2 id="agentDisplayName" style="font-size: 1rem; margin: 0 0 2px; color: #f1f5f9;">Zara</h2>
+                        <p id="agentStatus" class="agent-status" style="font-size: 0.75rem; margin: 0;">Product
+                            Consultant · Discovery</p>
                     </div>
                 </div>
                 <div style="display: flex; gap: 0.5rem;">

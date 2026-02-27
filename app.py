@@ -100,6 +100,9 @@ async def websocket_chat(websocket: WebSocket, session_id: str):
             if not user_message:
                 continue
 
+            # ── Always re-read from dict so reset/transitions are reflected ──
+            state = sessions[session_id]
+
             if user_message.strip() == "/reset_session":
                 sessions[session_id] = AgentState(
                     user_id=session_id, 
@@ -107,6 +110,12 @@ async def websocket_chat(websocket: WebSocket, session_id: str):
                     shared_context={}, 
                     current_agent="Discovery"
                 )
+                # Send confirmation back so frontend knows the session is clean
+                await manager.send_event(session_id, "sync_state", {
+                    "messages": [],
+                    "current_agent": "Discovery",
+                    "shared_context": {}
+                })
                 continue
 
             if state.current_agent in ["Completed", "None"]:
@@ -132,6 +141,8 @@ async def websocket_chat(websocket: WebSocket, session_id: str):
                 
                 # Await the async run logic
                 state = await agent.run_async(state, emit_callback)
+                # Keep sessions dict in sync after each agent run
+                sessions[session_id] = state
                 
                 if state.current_agent != current_name:
                     # It transitioned
