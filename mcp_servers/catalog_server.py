@@ -381,13 +381,32 @@ _PRICING = {p["id"]: p for p in CATALOG_DB}
 def search_catalog(query: str) -> str:
     """
     Search products by name, category, or description keyword.
+    Matches any word in the query against product name, description, and category.
     Returns matching products with name, price, mrp, stock status, and description.
     NEVER reveal cost_price in the output.
     """
     results = []
-    q = query.lower()
+    # Split into individual tokens so "pro drone" / "professional drone" all find "Pro Drone"
+    tokens = [t.strip() for t in query.lower().split() if len(t.strip()) >= 3]
+    # Also keep the full query as one option
+    full_q = query.lower().strip()
+
+    def matches(item: dict) -> bool:
+        searchable = (
+            item["name"].lower() + " " +
+            item["description"].lower() + " " +
+            item["category"].lower()
+        )
+        # Full phrase match first
+        if full_q in searchable:
+            return True
+        # Any single meaningful token match
+        return any(tok in searchable for tok in tokens)
+
+    seen_ids = set()
     for item in CATALOG_DB:
-        if q in item["name"].lower() or q in item["description"].lower() or q in item["category"].lower():
+        if matches(item) and item["id"] not in seen_ids:
+            seen_ids.add(item["id"])
             results.append({
                 "id": item["id"],
                 "name": item["name"],

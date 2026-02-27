@@ -5,6 +5,14 @@ from adk.mcp_client import ToolExecutor
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional, Callable
 
+# Lazy import to avoid circular dependency — only used for cart enrichment
+def _get_catalog_lookup():
+    try:
+        from mcp_servers.catalog_server import _PRICING
+        return _PRICING
+    except Exception:
+        return {}
+
 class AgentState(BaseModel):
     user_id: str
     messages: List[Dict[str, Any]]
@@ -152,15 +160,32 @@ class Agent:
                     if tool_call.function.name == "handoff_to_inventory" and "agreed_price" in result:
                         try:
                             res_val = json.loads(result)
+                            product_id = res_val.get("product_id")
+                            agreed_price = res_val.get("agreed_price")
+
+                            # Enrich with catalog data for the frontend discount display
+                            catalog = _get_catalog_lookup()
+                            product_info = catalog.get(product_id, {})
+                            product_name = product_info.get("name", product_id)
+                            original_price = product_info.get("price", agreed_price)
+                            savings = round(original_price - agreed_price, 2)
+
                             await emit_event("price_update", {
-                                "product_id": res_val.get("product_id"),
-                                "new_price": res_val.get("agreed_price"),
+                                "product_id": product_id,
+                                "new_price": agreed_price,
                                 "reason": "Negotiated Deal"
                             })
                             await emit_event("cart_update", {
-                                "items": [{"id": res_val.get("product_id"), "qty": 1}],
-                                "total": res_val.get("agreed_price"),
-                                "status": "pending_inventory"
+                                "items": [{
+                                    "id": product_id,
+                                    "name": product_name,
+                                    "qty": 1,
+                                    "agreed_price": agreed_price,
+                                    "original_price": original_price,
+                                    "savings": savings
+                                }],
+                                "total": agreed_price,
+                                "status": "reserved"
                             })
                         except:
                             pass

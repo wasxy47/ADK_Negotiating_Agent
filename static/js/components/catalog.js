@@ -59,10 +59,10 @@ async function fetchCatalog() {
         const res = await fetch("/api/catalog");
         const data = await res.json();
 
-        // Convert map to array and cache
-        allProducts = Object.keys(data.products).map(pid => {
-            return { id: pid, ...data.products[pid] };
-        });
+        // API returns { products: [...] } — an array, use it directly
+        allProducts = Array.isArray(data.products)
+            ? data.products
+            : Object.values(data.products);
 
         renderCategoryPills();
         renderCatalog(allProducts);
@@ -186,17 +186,40 @@ function openModal(product) {
         newNegBtn.style.cursor = 'not-allowed';
     } else {
         newBuyBtn.addEventListener('click', () => {
-            // Direct purchase flow - add to cart api or send a system message
-            wsClient.sendMessage(`I want to instantly buy one ${product.name} at full price without negotiating.`);
             closeModal();
             if (window.openAIWidget) window.openAIWidget();
+
+            // Immediately populate the cart widget at full MRP price
+            import('../state-manager.js').then(({ state }) => {
+                state.updateCart({
+                    items: [{
+                        id: product.id,
+                        name: product.name,
+                        qty: 1,
+                        agreed_price: product.price,
+                        original_price: product.mrp || product.price,
+                        savings: product.mrp ? Math.max(0, product.mrp - product.price) : 0
+                    }],
+                    total: product.price,
+                    status: 'reserved'
+                });
+            });
+
+            // Send a very explicit buy-intent message so Discovery → OrderTaking immediately
+            wsClient.sendMessage(
+                `I want to buy the ${product.name} (product ID: ${product.id}) right now ` +
+                `at the listed price of Rs. ${product.price}. Please proceed to checkout.`
+            );
         });
 
         newNegBtn.addEventListener('click', () => {
-            // Trigger negotiation flow
-            wsClient.sendMessage(`I am interested in the ${product.name}. Is there any flexibility on the price?`);
             closeModal();
             if (window.openAIWidget) window.openAIWidget();
+            // Trigger negotiation flow
+            wsClient.sendMessage(
+                `I am interested in the ${product.name} (product ID: ${product.id}). ` +
+                `The listed price is Rs. ${product.price}. Is there any flexibility on the price?`
+            );
         });
     }
 

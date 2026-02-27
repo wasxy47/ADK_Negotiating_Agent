@@ -28,7 +28,8 @@ def handoff_to_inventory(product_id: str, agreed_price: float, reason: str) -> s
         "handoff_to": "Inventory",
         "product_id": product_id,
         "agreed_price": agreed_price,
-        "reason": reason
+        "reason": reason,
+        "locked_price": agreed_price   # redundant but explicit for downstream agents
     })
 
 
